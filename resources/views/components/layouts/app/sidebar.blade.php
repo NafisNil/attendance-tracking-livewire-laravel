@@ -15,6 +15,8 @@
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home"  :href="route( Auth::user()->role == 'teacher' ? 'teacher.dashboard' : 'admin.dashboard')" :current="request()->routeIs(Auth::user()->role == 'teacher' ? 'teacher.dashboard' : 'admin.dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
                 </flux:navlist.group>
+                <flux:navlist.item icon="users"  :href="route( 'student.index')" :current="request()->routeIs( 'student.index')" wire:navigate>{{ __('Student Management') }}</flux:navlist.item>
+                <flux:navlist.item icon="academic-cap"  :href="route( 'grade.index')" :current="request()->routeIs( 'grade.index')" wire:navigate>{{ __('Grade Management') }}</flux:navlist.item>
             </flux:navlist>
 
             <flux:spacer />
@@ -126,7 +128,7 @@
         </flux:header>
 
         {{ $slot }}
-
+        <x-toaster-hub /> 
         @fluxScripts
     </body>
 </html>
