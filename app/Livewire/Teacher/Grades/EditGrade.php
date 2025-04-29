@@ -25,7 +25,7 @@ class EditGrade extends Component
         
         ]);
 
-       $grade =  Grade::find($this->student_details->id)->update([
+       $grade =  Grade::find($this->grade_details->id)->update([
             'name' => $this->name,
          
         ]);

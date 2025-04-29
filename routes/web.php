@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\TeacherMiddleware;
 use App\Livewire\Admin\AdminDashboard;
+use App\Livewire\Teacher\Attendace\AttendacePage;
 use App\Livewire\Teacher\Students\AddStudent;
 use App\Livewire\Teacher\Students\EditStudent;
 use App\Livewire\Teacher\Grades\AddGrade;
@@ -30,6 +31,9 @@ Route::middleware(['auth'])->group(function(){
     Route::get('grade-list', GradeList::class)->name('grade.index');
     Route::get('create-grade', AddGrade::class)->name('grade.create');
     Route::get('edit-grade/{id}', EditGrade::class)->name('grade.edit');
+
+    //attendance
+    Route::get('attendance', AttendacePage::class)->name('attendance.page');
 });
 
 Route::middleware(['auth'])->group(function () {
