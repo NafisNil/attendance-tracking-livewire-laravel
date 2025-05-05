@@ -7,6 +7,9 @@ use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Attendance;
 use Carbon\Carbon;
+use Masmerise\Toaster\Toaster;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AttendanceExport;
 
 class AttendacePage extends Component
 {
@@ -35,8 +38,32 @@ class AttendacePage extends Component
             # code...
         }
     }
+
+    public function updateAttendance($studentID, $day, $status){
+        $date = Carbon::create($this->year, $this->month, $day)->format('Y-m-d');
+        $attendance = Attendance::updateOrCreate(
+            ['student_id' => $studentID, 'date' => $date],
+            ['status' => $status, 'grade_id' => $this->grade]
+        );
+        $this->attendances[$studentID][$day] = $status;
+        Toaster::success('Attendance for date ' . $date . ' updated successfully for '.$studentID);
+    }
+
+    public function markAll($day, $status){
+        foreach ($this->students as $student) {
+            $this->updateAttendance($student->id, $day, $status);
+        }
+        Toaster::success('All students attendance for date ' . Carbon::create($this->year, $this->month, $day)->format('Y-m-d') . ' updated successfully');
+
+    }
+
+    public function exportToExcel(){
+        return Excel::download(new AttendanceExport($this->year, $this->month, $this->grade), 'attendance.xlsx');
+    }
+
     public function render()
     {
+        $this->fetchStudents();
         $current_year = Carbon::now()->format('Y');
         $this->current_year = $current_year;
         return view('livewire.teacher.attendace.attendace-page',[

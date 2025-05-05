@@ -1,170 +1,140 @@
 <div>
     {{-- A good traveler has no fixed plans and is not intent upon arriving. --}}
-
     <div class="inline-flex gap-x-2">
-        <select wire:model="year" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-            <option selected="">Select year</option>
-            @foreach (range(now()->year - 2, now()->year) as $item)
-            <option value="{{ $item }}">{{ $item }}</option>
-            @endforeach
-        </select>
+      <select wire:model="year"
+          class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+          <option selected="">Select Year</option>
+          @foreach (range(now()->year - 3, now()->year) as $y)
+              <option value="{{ $y }}">{{ $y }}</option>
+          @endforeach
+      </select>
+      <select wire:model="month"
+          class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+          <option selected="">Select Month</option>
+          @foreach (range(1, 12) as $m)
+              <option value="{{ $m }}">{{ Carbon\Carbon::create()->month($m)->format('F') }}
+              </option>
+          @endforeach
+      </select>
+      <select wire:model="grade"
+          class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+          <option selected="">Select Grade</option>
+          @foreach ($grades as $grade)
+              <option value="{{ $grade->id }}">{{ $grade->name }}</option>
+          @endforeach
+      </select>
+      <button type="button" wire:click="fetchStudents()"
+          class="flex shrink-0 justify-center items-center gap-2 size-9.5 text-sm font-medium rounded-lg border border-transparent bg-green-500 text-white hover:bg-green-600 focus:outline-hidden focus:bg-green-700 disabled:opacity-50 disabled:pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+      </button>
+      @if ($year && $month && $grade)
+      <button type="button" wire:click="exportToExcel()"
+          class="flex shrink-0 justify-center items-center gap-2 size-9.5 text-sm font-medium rounded-lg border border-transparent bg-green-500 text-white hover:bg-green-600 focus:outline-hidden focus:bg-green-700 disabled:opacity-50 disabled:pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25M9 16.5v.75m3-3v3M15 12v5.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+            </svg>
+      </button>
+      @endif
+  </div>
+  <!-- Table Section -->
+  <div class="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+      @if ($year && $month && $grade)
+          <!-- Card -->
+      <div class="flex flex-col mt-1">
+          <div class="-m-1.5 overflow-x-auto">
+              <div class="p-1.5 min-w-full inline-block align-middle">
+                  <div
+                      class="bg-white border border-gray-200 rounded-xl shadow-2xs overflow-hidden dark:bg-neutral-900 dark:border-neutral-700">
+                      <!-- Header -->
+                      <div
+                          class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 dark:border-neutral-700">
+                          <div>
+                              <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-200">
+                                  Attendance
+                              </h2>
+                              <p class="text-sm text-gray-600 dark:text-neutral-400">
+                                  Attendance Management.
+                              </p>
+                          </div>
 
-        <select wire:model="month" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-            <option selected="">Select month</option>
-            @foreach (range(1,12) as $item)
-            <option value="{{ $item }}">{{ Carbon\Carbon::create()->month($item)->format('F') }}</option>
-            @endforeach
-        </select>
+                          <div>
 
-        <select wire:model="grade" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-            <option selected="">Select Grade</option>
-            @foreach ($grades as $item)
-            <option value="{{ $item->id }}">{{ $item->name }}</option>
-            @endforeach
-        </select>
+                          </div>
+                      </div>
+                      <!-- End Header -->
 
-        <button wire:click="fetchStudents()" type="button" class="flex shrink-0 justify-center items-center gap-2 size-9.5 text-sm font-medium rounded-lg border border-transparent bg-cyan-600 text-white hover:bg-cyan-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-              </svg>              
-          </button>
-    </div>
-            <!-- Table Section -->
-<div class="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
-    <!-- Card -->
-    <div class="flex flex-col">
-      <div class="-m-1.5 overflow-x-auto">
-        <div class="p-1.5 min-w-full inline-block align-middle">
-          <div class="bg-white border border-gray-200 rounded-xl shadow-2xs overflow-hidden dark:bg-neutral-900 dark:border-neutral-700">
-            <!-- Header -->
-            <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 dark:border-neutral-700">
-              <div>
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-200">
-                  Attendance
-                </h2>
-                <p class="text-sm text-gray-600 dark:text-neutral-400">
-                  Attendance Management
-                </p>
+                      <!-- Table -->
+                      <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                          <thead
+                              class="bg-gray-50 divide-y divide-gray-200 dark:bg-neutral-800 dark:divide-neutral-700">
+                              <tr>
+                                  <th scope="col"
+                                      class="px-6 py-3 text-start border-s border-gray-200 dark:border-neutral-700">
+                                      <span
+                                          class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">
+                                          Student Name
+                                      </span>
+                                  </th>
+                                  @foreach (range(1, $daysInMonth) as $day)
+                                      <th scope="col"
+                                          class="px-6 py-3 text-start border-s border-gray-200 dark:border-neutral-700">
+                                          <span
+                                              class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">
+                                              {{ $day }}
+                                              <select wire:change="markAll({{ $day }}, $event.target.value)"
+                                                  class="dark:bg-neutral-900">
+                                                      <option  value="">All</option>
+                                                      <option  value="present">Present</option>
+                                                      <option  value="absent">Absent</option>
+                                                      <option  value="sick">Sick</option>
+                                                      <option  value="other">Other</option>
+                                              </select>
+                                      </span>
+                                      </th>
+                                  @endforeach
+
+                              </tr>
+                          </thead>
+
+                          <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
+                              @foreach ($students as $student)
+                              <tr :key="{{ $student->id }}">
+                                  <td class="h-px w-auto whitespace-nowrap">
+                                      <div class="px-6 py-2">
+                                          <span
+                                              class="font-semibold text-sm text-gray-800 dark:text-neutral-200">{{ $student->first_name }} {{ $student->last_name }} </span>
+                                          {{-- <span class="text-xs text-gray-500 dark:text-neutral-500">(23.16%)</span> --}}
+                                      </div>
+                                  </td>
+                                  @foreach (range(1, $daysInMonth) as $day)
+                                  <td class="h-px w-auto whitespace-nowrap">
+                                      <div class="px-6 py-2">
+                                          <select wire:change="updateAttendance({{ $student->id}}, {{ $day }}, $event.target.value )"
+                                          class="dark:bg-neutral-900">
+                                              <option  value="present" {{ $attendances[$student->id][$day] == 'present' ? 'selected' : ''}}>Present</option>
+                                              <option  value="absent" {{ $attendances[$student->id][$day] == 'absent' ? 'selected' : ''}}>Absent</option>
+                                              <option  value="sick"  {{ $attendances[$student->id][$day] == 'sick' ? 'selected' : ''}}>Sick</option>
+                                              <option  value="other" {{ $attendances[$student->id][$day] == 'other' ? 'selected' : ''}}>Other</option>
+                                      </select>
+                                      </div>
+                                  </td>
+                                  @endforeach
+                              </tr>
+                              @endforeach
+                          </tbody>
+                      </table>
+                      <!-- End Table -->
+                  </div>
               </div>
-  
-              <div>
-                <div class="inline-flex gap-x-2">
-                    <select wire:model="year" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-                        <option selected="">Select year</option>
-                        @foreach (range(now()->year - 2, now()->year) as $item)
-                        <option value="{{ $item }}">{{ $item }}</option>
-                        @endforeach
-                    </select>
-            
-                    <select wire:model="month" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-                        <option selected="">Select month</option>
-                        @foreach (range(1,12) as $item)
-                        <option value="{{ $item }}">{{ Carbon\Carbon::create()->month($item)->format('F') }}</option>
-                        @endforeach
-                    </select>
-            
-                    <select wire:model="grade" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-                        <option selected="">Select Grade</option>
-                        @foreach ($grades as $item)
-                        <option value="{{ $item->id }}">{{ $item->name }}</option>
-                        @endforeach
-                    </select>
-            
-                    <button wire:click="fetchStudents()" type="button" class="flex shrink-0 justify-center items-center gap-2 size-9.5 text-sm font-medium rounded-lg border border-transparent bg-cyan-600 text-white hover:bg-cyan-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                          </svg>              
-                      </button>
-                </div>
-              </div>
-            </div>
-            <!-- End Header -->
-  
-            <!-- Table -->
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-              <thead class="bg-gray-50 divide-y divide-gray-200 dark:bg-neutral-800 dark:divide-neutral-700">
-            
-                <tr ">
-                  <th scope="col" class="px-6 py-3 text-start border-s border-gray-200 dark:border-neutral-700">
-                    <span class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">
-                      Name
-                    </span>
-                  </th>
-
-                  @foreach (range(1, $daysInMonth) as $item)
-                    <th scope="col" class="px-6 py-3 text-center" colspan="2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200">
-                        {{ $item }}
-                        </span>
-                    </th>
-                  @endforeach
-                </tr>
-            
-              </thead>
-  
-              <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
-                {{-- @foreach ($grades as $item)
-                <tr :key='{{ $item->id }}' class="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                  <td class="h-px w-auto whitespace-nowrap">
-                    <div class="px-6 py-2">
-                      <span class="text-sm text-gray-800 dark:text-neutral-200">{{ $item->name }}</span>
-                   
-                    </div>
-                  </td>
-                  <td class="h-px w-auto whitespace-nowrap text-center">
-                    <a href="/edit-grade/{{$item->id}}" class="flex shrink-0 justify-center items-center gap-2 size-9.5 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                      </svg>
-                      
-                    </button>
-
-                  </td>
-                  <td  class="h-px w-auto whitespace-nowrap text-center">
-                    <button wire:click="delete({{ $item->id }})" type="button" class="flex shrink-0 justify-center items-center gap-2 size-9.5 text-sm font-medium rounded-lg border border-transparent bg-red-600 text-white hover:bg-red-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                      </svg>
-                      
-                    </button>
-                  </td>
-
-                </tr>
-                @endforeach --}}
-
- 
-              </tbody>
-            </table>
-            <!-- End Table -->
-  
-            <!-- Footer -->
-            <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-t border-gray-200 dark:border-neutral-700">
-              <div>
-                <p class="text-sm text-gray-600 dark:text-neutral-400">
-                  <span class="font-semibold text-gray-800 dark:text-neutral-200">9</span> results
-                </p>
-              </div>
-  
-              <div>
-                <div class="inline-flex gap-x-2">
-                  <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700">
-                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                    Prev
-                  </button>
-  
-                  <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700">
-                    Next
-                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <!-- End Footer -->
           </div>
-        </div>
       </div>
-    </div>
-    <!-- End Card -->
+      <!-- End Card -->
+      @endif
+      
   </div>
   <!-- End Table Section -->
 </div>
